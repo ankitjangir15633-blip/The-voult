@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VAULT | NETFLIX</title>
+    <style>
+        body { margin: 0; background: #141414; color: white; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        header { padding: 20px 4%; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); position: fixed; width: 100%; z-index: 10; }
+        .logo { color: #e50914; font-size: 28px; font-weight: bold; letter-spacing: -1px; }
+        .hero { height: 70vh; background: url('https://wallpapercave.com/wp/wp1917154.jpg') center/cover; display: flex; align-items: center; padding: 0 4%; }
+        .hero-content { max-width: 500px; }
+        input { width: 90%; padding: 15px; margin: 20px 0; border-radius: 4px; border: none; background: rgba(0,0,0,0.75); color: white; border: 1px solid #808080; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 4%; }
+        .card { transition: transform 0.3s; cursor: pointer; position: relative; }
+        .card:hover { transform: scale(1.1); z-index: 2; }
+        .card img { width: 100%; border-radius: 4px; }
+        #player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 100; }
+        .close { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: white; z-index: 101; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+<header><div class="logo">THE VAULT</div></header>
+
+<div class="hero">
+    <div class="hero-content">
+        <h1>Movies & More</h1>
+        <input type="text" id="s" placeholder="Search Movie/Show..." onkeyup="search()">
+    </div>
+</div>
+
+<div class="grid" id="g"></div>
+
+<div id="player">
+    <span class="close" onclick="closeP()">×</span>
+    <iframe id="f" allowfullscreen></iframe>
+</div>
+
+<script>
+    const api = "https://api.themoviedb.org/3/search/multi?api_key=15d1a9983d3246a1d0c4ded411275e84&query=";
+    
+    async function search() {
+        const v = document.getElementById('s').value;
+        if(v.length < 3) return;
+        const res = await fetch(api + v);
+        const data = await res.json();
+        const g = document.getElementById('g');
+        g.innerHTML = '';
+        data.results.forEach(m => {
+            if(!m.poster_path) return;
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => {
+                const type = m.media_type === 'tv' ? 'tv' : 'movie';
+                document.getElementById('f').src = `https://vidsrc.me/embed/${type}?tmdb=${m.id}`;
+                document.getElementById('player').style.display = 'block';
+            };
+            // Poster Proxy to bypass India blocks
+            div.innerHTML = `<img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w300${m.poster_path}">`;
+            g.appendChild(div);
+        });
+    }
+    function closeP() { document.getElementById('player').style.display = 'none'; document.getElementById('f').src = ''; }
+</script>
+
+</body>
+</html>
