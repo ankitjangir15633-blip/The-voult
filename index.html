@@ -6,58 +6,58 @@
     <title>THE VAULT | PAUL SOMENDRA</title>
     <style>
         body { margin: 0; background: #000; color: white; font-family: sans-serif; }
-        header { padding: 15px; text-align: center; color: #e50914; font-size: 1.5rem; font-weight: 900; }
-        .search-box { padding: 10px; text-align: center; sticky; top: 0; background: #000; z-index: 10; }
-        input { width: 85%; padding: 12px; border-radius: 5px; border: 1px solid #e50914; background: #222; color: white; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; }
-        .card { background: #111; border-radius: 5px; overflow: hidden; cursor: pointer; border: 1px solid #222; }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        header { padding: 20px; text-align: center; color: #e50914; font-size: 22px; font-weight: bold; }
+        .category { padding: 10px 20px; color: #aaa; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 15px; }
+        .card { background: #111; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid #222; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .card p { padding: 8px; margin: 0; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; }
         #player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 1000; }
-        .close { position: absolute; top: 15px; right: 15px; font-size: 35px; color: #fff; z-index: 1001; font-weight: bold; }
+        .close { position: absolute; top: 20px; right: 20px; font-size: 40px; color: #fff; cursor: pointer; z-index: 1001; }
         iframe { width: 100%; height: 100%; border: none; }
-        footer { text-align: center; padding: 20px; font-size: 10px; opacity: 0.5; }
+        footer { text-align: center; padding: 30px; font-size: 10px; opacity: 0.4; border-top: 1px solid #222; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <header>THE VAULT</header>
-<div class="search-box">
-    <input type="text" id="s" placeholder="Search Worldwide Movies..." onkeyup="search()">
+
+<div class="category">Trending Worldwide</div>
+<div class="grid" id="movieGrid">
+    <script>
+        const movies = [
+            {n:"Avatar: Way of Water", id:"76600", img:"/t6HIqrS0SjZ7pS0H3uNfPn17pUM.jpg"},
+            {n:"John Wick 4", id:"603692", img:"/vO9fXvYwP6T0h8O6E9fW9O1B1P.jpg"},
+            {n:"Oppenheimer", id:"872585", img:"/8GxvA0zMB6R1788stIBS3j9pLbr.jpg"},
+            {n:"The Batman", id:"414906", img:"/74xTEgt7R36Fpooo50r9T6fBQv6.jpg"},
+            {n:"Deadpool & Wolverine", id:"533535", img:"/8cdWjvZQUmSMyU9t2S78STmSost.jpg"},
+            {n:"Spider-Man: No Way Home", id:"634649", img:"/1g0dhvRzfwvS1n16pP0U1fkpXqx.jpg"},
+            {n:"Avengers: Endgame", id:"299534", img:"/or06vS3ST0PgpCgCwvKvbM0pNWG.jpg"},
+            {n:"Interstellar", id:"157336", img:"/gEU2QniE6E07Qv8vNGjuRUDQp6m.jpg"},
+            {n:"Stranger Things", id:"66732", img:"/49WfT1UgiHkYJ0pBrv3YqJu6S36.jpg", type:"tv"},
+            {n:"The Boys", id:"76479", img:"/7Ns9vYvFI96DRv9cyZ0YvSjD69r.jpg", type:"tv"}
+        ];
+
+        const grid = document.getElementById('movieGrid');
+        movies.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => {
+                const t = m.type || 'movie';
+                document.getElementById('f').src = `https://vidsrc.me/embed/${t}?tmdb=${m.id}`;
+                document.getElementById('player').style.display = 'block';
+            };
+            div.innerHTML = `<img src="https://wsrv.nl/?url=https://image.tmdb.org/t/p/w300${m.img}"><p>${m.n}</p>`;
+            grid.appendChild(div);
+        });
+    </script>
 </div>
 
-<div class="grid" id="g"></div>
-
-<footer>PAUL SOMENDRA | WORK SMART NOT HARD</footer>
+<footer>DESIGNED FOR PAUL SOMENDRA <br> WORK SMART NOT HARD</footer>
 
 <div id="player"><span class="close" onclick="stop()">×</span><iframe id="f" allowfullscreen></iframe></div>
 
 <script>
-    const key = "15d1a9983d3246a1d0c4ded411275e84";
-    // Naya Proxy Server for Images
-    const proxy = "https://wsrv.nl/?url=";
-
-    async function search() {
-        const v = document.getElementById('s').value;
-        if(v.length < 3) return;
-        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${v}`);
-        const data = await res.json();
-        const g = document.getElementById('g');
-        g.innerHTML = '';
-        data.results.forEach(m => {
-            if(!m.poster_path) return;
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.onclick = () => {
-                const type = m.media_type === 'tv' ? 'tv' : 'movie';
-                document.getElementById('f').src = `https://vidsrc.me/embed/${type}?tmdb=${m.id}`;
-                document.getElementById('player').style.display = 'block';
-            };
-            // Double proxy for India
-            div.innerHTML = `<img src="${proxy}https://image.tmdb.org/t/p/w200${m.poster_path}"><p style="font-size:10px; padding:5px; margin:0;">${m.title || m.name}</p>`;
-            g.appendChild(div);
-        });
-    }
-
     function stop() { document.getElementById('player').style.display = 'none'; document.getElementById('f').src = ''; }
 </script>
 </body>
