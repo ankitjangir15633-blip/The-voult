@@ -3,87 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE VAULT | HINDI ONLY</title>
+    <title>JARVIS COMMAND | AJ</title>
     <style>
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow-x: hidden; }
-        header { padding: 15px 5%; background: #000; border-bottom: 2px solid #e50914; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .logo { color: #e50914; font-size: 24px; font-weight: 900; }
-        .row-title { padding: 20px 5% 5px; font-size: 16px; font-weight: bold; color: #fff; text-transform: uppercase; }
-        .row-container { display: flex; overflow-x: auto; padding: 10px 5% 20px; gap: 15px; scrollbar-width: none; }
-        .row-container::-webkit-scrollbar { display: none; }
-        .card { min-width: 130px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; background: #111; border: 1px solid #222; position: relative; }
-        .card:hover { transform: scale(1.1); z-index: 10; border-color: #e50914; }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card p { padding: 8px; margin: 0; font-size: 10px; text-align: center; font-weight: bold; height: 30px; display: flex; align-items: center; justify-content: center; }
-        .hindi-tag { position: absolute; top: 5px; right: 5px; background: #e50914; font-size: 8px; padding: 2px 5px; border-radius: 3px; font-weight: 900; }
-        #player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 2000; }
-        .close { position: absolute; top: 20px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 2001; background: rgba(0,0,0,0.5); width: 50px; height: 50px; border-radius: 50%; text-align: center; }
-        iframe { width: 100%; height: 100%; border: none; }
-        footer { text-align: center; padding: 40px; opacity: 0.4; font-size: 10px; border-top: 1px solid #1a1a1a; }
+        body { margin: 0; background: #000; color: #00f2ff; font-family: 'Courier New', monospace; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+        .arc { width: 100px; height: 100px; border: 4px solid #00f2ff; border-radius: 50%; margin: 20px auto; box-shadow: 0 0 20px #00f2ff; animation: pulse 1s infinite; cursor: pointer; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #status { font-size: 1.2rem; margin-bottom: 10px; }
     </style>
 </head>
-<body>
-
-<header><div class="logo">THE VAULT HINDI</div></header>
-
-<div class="row-title">बॉलीवुड धमाकेदार फ़िल्में</div>
-<div class="row-container" id="bolly"></div>
-
-<div class="row-title">हिंदी डब एक्शन (Marvel & More)</div>
-<div class="row-container" id="dubbed"></div>
-
-<div class="row-title">हिंदी वेब सीरीज (All Episodes)</div>
-<div class="row-container" id="series"></div>
-
-<footer>DESIGNED BY PAUL SOMENDRA <br> WORK SMART NOT HARD</footer>
-
-<div id="player"><span class="close" onclick="stop()">×</span><iframe id="f" allowfullscreen></iframe></div>
+<body onclick="startJarvis()">
+    <div id="status">MISTER AJ<br>TAP TO START</div>
+    <div class="arc"></div>
+    <div id="log" style="font-size:10px; color:#555;">> Waiting...</div>
 
 <script>
-    // Strictly Hindi Data
-    const bollyData = [
-        {n:"स्त्री 2", id:"1034541"}, {n:"जवान", id:"114479"}, {n:"पठान", id:"864692"}, {n:"एनिमल", id:"781732"},
-        {n:"ब्रह्मास्त्र", id:"496331"}, {n:"पुष्पा: द राइज", id:"735395"}, {n:"KGF 2", id:"588228"}, {n:"RRR", id:"579974"}
-    ];
-    const dubbedData = [
-        {n:"आयरन मैन", id:"1726"}, {n:"अवेंजर्स: एंडगेम", id:"299534"}, {n:"स्पाइडर-मैन: नो वे होम", id:"634649"},
-        {n:"डेडपूल और वूल्वरिन", id:"533535"}, {n:"थॉर: लव एंड थंडर", id:"616037"}, {n:"डॉक्टर स्ट्रेंज 2", id:"453395"}
-    ];
-    const seriesData = [
-        {n:"मिर्जापुर", id:"82883", t:"tv"}, {n:"मनी हिस्ट", id:"71446", t:"tv"}, {n:"स्ट्रेंजर थिंग्स", id:"66732", t:"tv"},
-        {n:"द बॉयज़", id:"76479", t:"tv"}, {n:"लोकी", id:"84958", t:"tv"}, {n:"स्क्वीड गेम", id:"115036", t:"tv"}
-    ];
+    const GITHUB_TOKEN = "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";
+    const USERNAME = "ankitjangir15633-bllp";
+    const REPO = "The-Vault";
 
-    // Naya Image Proxy (Posters Fix)
-    const imgProxy = "https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w300";
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'hi-IN';
 
-    function loadRow(data, containerId) {
-        const container = document.getElementById(containerId);
-        data.forEach(m => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.onclick = () => play(m.id, m.t || 'movie');
-            // Hum posters ko naye raste se load kar rahe hain
-            div.innerHTML = `
-                <div class="hindi-tag">HINDI</div>
-                <img src="${imgProxy}${m.id}.jpg" onerror="this.src='https://vidsrc.xyz/images/${m.t === 'tv' ? 'tv' : 'movie'}/${m.id}'">
-                <p>${m.n}</p>
-            `;
-            container.appendChild(div);
-        });
+    function startJarvis() {
+        recognition.start();
+        document.getElementById('status').innerText = "LISTENING...";
+        speak("Authorized. AJ, what is your command?");
     }
 
-    function play(id, type) {
-        // vidsrc.pro ya vidsrc.me Hindi audio ke liye better hain
-        document.getElementById('f').src = `https://vidsrc.me/embed/${type}?tmdb=${id}`;
-        document.getElementById('player').style.display = 'block';
-    }
+    recognition.onresult = async (event) => {
+        const cmd = event.results[0][0].transcript.toLowerCase();
+        document.getElementById('log').innerText = "AJ: " + cmd;
+        
+        if(cmd.includes("app") || cmd.includes("banao")) {
+            speak("Executing action. Creating file on GitHub.");
+            const fileName = "AJ_Task_" + Date.now() + ".html";
+            const url = `https://api.github.com/repos/${USERNAME}/${REPO}/contents/${fileName}`;
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "AJ Command", content: btoa("<h1>Task Complete for AJ</h1>") })
+            });
+            if(res.ok) speak("Task complete, AJ.");
+        }
+    };
 
-    function stop() { document.getElementById('player').style.display = 'none'; document.getElementById('f').src = ''; }
-
-    loadRow(bollyData, 'bolly');
-    loadRow(dubbedData, 'dubbed');
-    loadRow(seriesData, 'series');
+    function speak(t) { window.speechSynthesis.speak(new SpeechSynthesisUtterance(t)); }
 </script>
 </body>
 </html>
