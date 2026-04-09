@@ -3,112 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE VAULT | HINDI PREMIUM</title>
+    <title>THE VAULT | PAUL SOMENDRA</title>
     <style>
-        :root { --red: #e50914; --black: #050505; }
-        body { margin: 0; background: var(--black); color: white; font-family: 'Segoe UI', Arial, sans-serif; }
-        header { padding: 15px 5%; background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
-        .logo { color: var(--red); font-size: 26px; font-weight: 900; }
-        .search-area { padding: 20px 5%; text-align: center; }
-        input { width: 100%; max-width: 600px; padding: 15px 25px; border-radius: 30px; border: none; background: #222; color: white; font-size: 16px; outline: none; border: 1px solid #444; }
-        input:focus { border-color: var(--red); box-shadow: 0 0 10px var(--red); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px 5%; }
-        .card { background: #111; border-radius: 10px; overflow: hidden; cursor: pointer; transition: 0.4s; position: relative; }
-        .card:hover { transform: scale(1.07); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        body { margin: 0; background: #050505; color: white; font-family: 'Helvetica Neue', Arial, sans-serif; overflow-x: hidden; }
+        header { padding: 15px 5%; background: #000; border-bottom: 2px solid #e50914; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: #e50914; font-size: 24px; font-weight: 900; }
+        .tagline { font-size: 10px; color: #666; font-weight: bold; }
+        .row-title { padding: 25px 5% 10px; font-size: 18px; font-weight: bold; border-left: 4px solid #e50914; margin-left: 5%; margin-top: 10px; background: rgba(229, 9, 20, 0.05); }
+        .row-container { display: flex; overflow-x: scroll; padding: 10px 5% 30px; gap: 12px; scrollbar-width: none; }
+        .row-container::-webkit-scrollbar { display: none; }
+        .card { min-width: 130px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.4s; background: #111; border: 1px solid #222; }
+        .card:hover { transform: scale(1.1); z-index: 10; border-color: #e50914; box-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card p { padding: 10px; margin: 0; font-size: 12px; text-align: center; font-weight: bold; }
-        .lang-tag { position: absolute; top: 5px; right: 5px; background: var(--red); font-size: 10px; padding: 2px 6px; border-radius: 3px; }
-        #player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 5000; }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 5001; }
+        .card p { padding: 8px; margin: 0; font-size: 11px; text-align: center; font-weight: bold; background: #111; }
+        #player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 2000; }
+        .close { position: absolute; top: 20px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 2001; background: rgba(0,0,0,0.6); width: 50px; height: 50px; border-radius: 50%; text-align: center; }
         iframe { width: 100%; height: 100%; border: none; }
-        footer { text-align: center; padding: 40px; opacity: 0.5; font-size: 12px; border-top: 1px solid #222; }
+        footer { text-align: center; padding: 50px; opacity: 0.4; font-size: 11px; border-top: 1px solid #1a1a1a; margin-top: 30px; }
     </style>
 </head>
 <body>
 
-<header><div class="logo">THE VAULT HINDI</div></header>
+<header>
+    <div class="logo">THE VAULT</div>
+    <div class="tagline">WORK SMART NOT HARD</div>
+</header>
 
-<div class="search-area">
-    <input type="text" id="s" placeholder="Search Hindi Movies, Dubbed Series, Bollywood..." onkeyup="search()">
-</div>
+<div class="row-title">HINDI DUBBED: MARVEL & ACTION</div>
+<div class="row-container" id="marvel-row"></div>
 
-<div class="grid" id="g"></div>
+<div class="row-title">BOLLYWOOD ALL-TIME HITS</div>
+<div class="row-container" id="bolly-row"></div>
 
-<footer>DESIGNED BY PAUL SOMENDRA | WORK SMART NOT HARD</footer>
+<div class="row-title">WORLD-WIDE WEB SERIES (HINDI)</div>
+<div class="row-container" id="series-row"></div>
 
-<div id="player-overlay">
-    <span class="close-btn" onclick="closePlayer()">×</span>
-    <iframe id="video-frame" allowfullscreen></iframe>
-</div>
+<div class="row-title">SOUTH HINDI DUBBED SUPERSTARS</div>
+<div class="row-container" id="south-row"></div>
+
+<footer>DESIGNED FOR PAUL SOMENDRA <br> © 2026 THE VAULT - NO LIMITS</footer>
+
+<div id="player"><span class="close" onclick="stop()">×</span><iframe id="f" allowfullscreen></iframe></div>
 
 <script>
-    const API_KEY = "15d1a9983d3246a1d0c4ded411275e84";
-    const IMG_PROXY = "https://wsrv.nl/?url=https://image.tmdb.org/t/p/w300";
+    const marvel = [
+        {n:"Iron Man", id:"1726"}, {n:"Iron Man 2", id:"10138"}, {n:"Iron Man 3", id:"68721"},
+        {n:"Avengers", id:"24428"}, {n:"Age of Ultron", id:"99861"}, {n:"Infinity War", id:"299536"},
+        {n:"Endgame", id:"299534"}, {n:"Deadpool & Wolverine", id:"533535"}, {n:"Spider-Man: No Way Home", id:"634649"},
+        {n:"Doctor Strange 2", id:"453395"}, {n:"Thor: Love & Thunder", id:"616037"}, {n:"Black Panther 2", id:"505642"}
+    ];
 
-    // Start with Hindi Trending
-    async function init() {
-        // Bollywood & Hindi Dubbed Trending (Using Region IN)
-        const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
-        loadData(url);
-    }
+    const bolly = [
+        {n:"Pathaan", id:"864692"}, {n:"Jawan", id:"114479"}, {n:"Animal", id:"781732"},
+        {n:"Stree 2", id:"1034541"}, {n:"Brahmastra", id:"496331"}, {n:"War", id:"585268"},
+        {n:"Tiger 3", id:"753174"}, {n:"Dunki", id:"1008042"}, {n:"Rocky Aur Rani", id:"840430"},
+        {n:"Fighter", id:"850165"}, {n:"Bhool Bhulaiyaa 2", id:"624860"}, {n:"Drishyam 2", id:"951491"}
+    ];
 
-    async function search() {
-        const query = document.getElementById('s').value;
-        if(query.length < 3) { if(query.length == 0) init(); return; }
-        
-        // Search worldwide but query optimization for Hindi
-        const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&include_adult=false`;
-        loadData(url);
-    }
+    const series = [
+        {n:"Stranger Things", id:"66732", t:"tv"}, {n:"The Boys", id:"76479", t:"tv"},
+        {n:"Money Heist", id:"71446", t:"tv"}, {n:"Squid Game", id:"115036", t:"tv"},
+        {n:"Loki", id:"84958", t:"tv"}, {n:"All of Us Are Dead", id:"117355", t:"tv"},
+        {n:"The Last of Us", id:"100088", t:"tv"}, {n:"House of the Dragon", id:"94997", t:"tv"},
+        {n:"Wednesday", id:"119051", t:"tv"}, {n:"Mirzapur", id:"82883", t:"tv"}
+    ];
 
-    async function loadData(url) {
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            const g = document.getElementById('g');
-            g.innerHTML = '';
+    const south = [
+        {n:"Pushpa", id:"735395"}, {n:"KGF Chapter 1", id:"552532"}, {n:"KGF Chapter 2", id:"588228"},
+        {n:"RRR", id:"579974"}, {n:"Kantara", id:"1024530"}, {n:"Vikram", id:"823625"},
+        {n:"Bahubali 1", id:"256040"}, {n:"Bahubali 2", id:"350312"}, {n:"Leo", id:"1072790"},
+        {n:"Salaar", id:"805320"}, {n:"Hanu-Man", id:"1104163"}, {n:"Minnal Murali", id:"714277"}
+    ];
 
-            data.results.forEach(m => {
-                if(!m.poster_path) return;
-                
-                const div = document.createElement('div');
-                div.className = 'card';
-                // Isme "tv" aur "movie" dono ka support hai episodes ke liye
-                const type = m.media_type || (m.first_air_date ? 'tv' : 'movie');
-                
-                div.onclick = () => play(m.id, type);
-                
-                div.innerHTML = `
-                    <div class="lang-tag">HINDI</div>
-                    <img src="${IMG_PROXY}${m.poster_path}">
-                    <p>${m.title || m.name}</p>
-                `;
-                g.appendChild(div);
-            });
-        } catch (e) {
-            console.log("Error loading content. API might be blocked.");
-        }
+    function loadRow(data, elementId) {
+        const container = document.getElementById(elementId);
+        data.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => play(m.id, m.t || 'movie');
+            // Using direct poster proxy
+            div.innerHTML = `<img src="https://vidsrc.xyz/images/${m.t === 'tv' ? 'tv' : 'movie'}/${m.id}"><p>${m.n}</p>`;
+            container.appendChild(div);
+        });
     }
 
     function play(id, type) {
-        const overlay = document.getElementById('player-overlay');
-        const frame = document.getElementById('video-frame');
-        
-        // Multi-language servers jo episodes aur seasons control khud dete hain
-        // Isme click karte hi andar Seasons ka menu aa jayega
-        frame.src = `https://vidsrc.me/embed/${type}?tmdb=${id}`;
-        
-        overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Stop scroll
+        // vidsrc.me usually provides better multi-audio (Hindi) support
+        document.getElementById('f').src = `https://vidsrc.me/embed/${type}?tmdb=${id}`;
+        document.getElementById('player').style.display = 'block';
     }
 
-    function closePlayer() {
-        document.getElementById('player-overlay').style.display = 'none';
-        document.getElementById('video-frame').src = '';
-        document.body.style.overflow = 'auto';
+    function stop() {
+        document.getElementById('player').style.display = 'none';
+        document.getElementById('f').src = '';
     }
 
-    init();
+    loadRow(marvel, 'marvel-row');
+    loadRow(bolly, 'bolly-row');
+    loadRow(series, 'series-row');
+    loadRow(south, 'south-row');
 </script>
 </body>
 </html>
