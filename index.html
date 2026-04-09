@@ -1325,6 +1325,7 @@ function openModal(item) {
 
   document.getElementById('modalTitle').textContent = item.title;
   document.getElementById('modalDesc').textContent = item.desc;
+document.querySelector('.watch-btn').onclick = () => window.open('https://vidsrc.to/embed/' + item.type + '/' + item.title.replace(/\s+/g, '-').toLowerCase());
 
   const tags = [
     `<span class="modal-tag">${item.year}</span>`,
