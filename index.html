@@ -2,87 +2,79 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS OS | AUTHORIZED AJ</title>
+    <title>JARVIS V4 | PROTECTED</title>
     <style>
-        :root { --glow: #00f2ff; --bg: #020a10; }
-        body { margin: 0; background: var(--bg); color: var(--glow); font-family: 'Segoe UI', monospace; display: flex; flex-direction: column; height: 100vh; align-items: center; justify-content: center; overflow: hidden; }
-        
-        /* Cinematic Arc Reactor */
-        .reactor { width: 180px; height: 180px; border: 2px solid rgba(0, 242, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; animation: rotate 10s linear infinite; }
-        .reactor-inner { width: 120px; height: 120px; border: 4px solid var(--glow); border-radius: 50%; box-shadow: 0 0 30px var(--glow), inset 0 0 15px var(--glow); }
-        
-        @keyframes rotate { 100% { transform: rotate(360deg); } }
-        #status { margin-top: 40px; font-size: 14px; letter-spacing: 5px; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px var(--glow); }
-        #console { width: 85%; height: 120px; background: rgba(0,0,0,0.5); border: 1px solid #111; margin-top: 20px; padding: 10px; font-size: 11px; overflow-y: auto; color: #888; border-radius: 5px; }
+        body { background: #050505; color: #00f2ff; font-family: 'Courier New', monospace; text-align: center; padding-top: 50px; }
+        .arc { width: 150px; height: 150px; border: 4px solid #00f2ff; border-radius: 50%; margin: auto; box-shadow: 0 0 25px #00f2ff; cursor: pointer; }
+        input { background: #111; border: 1px solid #00f2ff; color: #fff; padding: 10px; margin-top: 20px; width: 80%; border-radius: 5px; }
+        button { background: #00f2ff; border: none; padding: 10px 20px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        #status { margin-top: 20px; font-size: 1.2rem; text-transform: uppercase; }
     </style>
 </head>
-<body onclick="activate()">
+<body>
+    <div id="setup" style="display:none;">
+        <h3>MISTER AJ, ENTER ACCESS KEY</h3>
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+        <br><button onclick="saveToken()">INITIALIZE SYSTEM</button>
+    </div>
 
-    <div id="status">AUTHENTICATION REQUIRED</div>
-    <div class="reactor"><div class="reactor-inner"></div></div>
-    <div id="console">> CORE_V4 READY...<br>> AWAITING AJ'S COMMAND...</div>
+    <div id="mainUI">
+        <div class="arc" onclick="startJarvis()"></div>
+        <div id="status">SYSTEM STANDBY</div>
+        <p id="log" style="font-size:12px; color:#444; margin-top:20px;">> Awaiting AJ's Voice...</p>
+    </div>
 
 <script>
-    // ⬇️ YAHAN APNA NAYA TOKEN DALO (BINA KISI KO BATAYE)
-    const TOKEN = "YAHAN_NAYA_TOKEN_PASTE_KARO"; 
-    const REPO_INFO = { user: "ankitjangir15633-blip", repo: "The-voult" };
+    let GITHUB_TOKEN = localStorage.getItem('aj_token');
+
+    if (!GITHUB_TOKEN) {
+        document.getElementById('setup').style.display = 'block';
+        document.getElementById('mainUI').style.display = 'none';
+    }
+
+    function saveToken() {
+        const val = document.getElementById('tokenInput').value;
+        if(val.startsWith('ghp_')) {
+            localStorage.setItem('aj_token', val);
+            location.reload();
+        } else { alert("Invalid Token Format, AJ."); }
+    }
 
     const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     rec.lang = 'hi-IN';
 
-    function activate() {
-        try {
-            rec.start();
-            document.getElementById('status').innerText = "LISTENING...";
-            speak("Authorized. Mister AJ, systems are at your command.");
-        } catch(e) {}
+    function speak(t) {
+        const m = new SpeechSynthesisUtterance(t);
+        m.pitch = 0.6; m.rate = 0.9;
+        window.speechSynthesis.speak(m);
+    }
+
+    function startJarvis() {
+        rec.start();
+        document.getElementById('status').innerText = "LISTENING...";
+        speak("Authorized. Mister AJ, systems are online.");
     }
 
     rec.onresult = async (e) => {
         const cmd = e.results[0][0].transcript.toLowerCase();
-        log("AJ: " + cmd);
-        
-        if(cmd.includes("app") || cmd.includes("banao") || cmd.includes("file")) {
-            executeBuild(cmd);
-        } else {
-            speak("Processing data, AJ.");
+        document.getElementById('log').innerText = "AJ: " + cmd;
+
+        if(cmd.includes("app") || cmd.includes("banao")) {
+            speak("Initiating build. Accessing GitHub Vault.");
+            
+            const res = await fetch(`https://api.github.com/repos/ankitjangir15633-blip/The-voult/contents/Build_${Date.now()}.html`, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "AJ CMD", content: btoa("<h1>Build Success</h1>") })
+            });
+
+            if(res.ok) { speak("Task finished, AJ. Check your repository."); }
+            else { 
+                speak("Access Denied. AJ, your token has expired.");
+                localStorage.removeItem('aj_token');
+                location.reload();
+            }
         }
-    }
-
-    async function executeBuild(cmd) {
-        speak("Action initiated. Deploying new architecture to your vault.");
-        const name = "Project_" + Math.floor(Math.random()*999) + ".html";
-        const content = btoa(`<h1>Build for AJ</h1><p>Command: ${cmd}</p>`);
-        
-        const res = await fetch(`https://api.github.com/repos/${REPO_INFO.user}/${REPO_INFO.repo}/contents/${name}`, {
-            method: "PUT",
-            headers: { "Authorization": `Bearer ${TOKEN}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "JARVIS Build", content: content })
-        });
-
-        if(res.ok) {
-            speak("Task complete, Mister AJ. The file is live.");
-            log("SUCCESS: " + name + " pushed.");
-        } else {
-            speak("Mister AJ, there is a security breach. Token is invalid.");
-            log("ERROR: Unauthorized access.");
-        }
-    }
-
-    function speak(text) {
-        const synth = window.speechSynthesis;
-        const msg = new SpeechSynthesisUtterance(text);
-        // Awaaz ko JARVIS jaisa bhari banane ke liye settings:
-        msg.pitch = 0.6; 
-        msg.rate = 0.9;
-        synth.speak(msg);
-    }
-
-    function log(m) { 
-        const c = document.getElementById('console');
-        c.innerHTML += "<br>> " + m; 
-        c.scrollTop = c.scrollHeight;
     }
 </script>
 </body>
