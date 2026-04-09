@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AJ VAULT — Stream Everything</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --neon-blue:#00d4ff;--neon-gold:#ffd700;--luffy-red:#e8112d;
+  --dark-bg:#080810;--card-bg:#0e0e1a;--surface:#14141f;
+  --border:rgba(0,212,255,0.15);--text-primary:#f0f0ff;--text-muted:#7878a0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Rajdhani',sans-serif;background:var(--dark-bg);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 40% at 20% 0%,rgba(232,17,45,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 30% at 80% 100%,rgba(0,212,255,.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1;}
+#app{position:relative;z-index:2;}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(8,8,16,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1.5rem;}
+.header-inner{max-width:1400px;margin:0 auto;height:64px;display:flex;align-items:center;gap:1.25rem;}
+.logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:.1em;color:var(--neon-blue);text-shadow:0 0 20px rgba(0,212,255,.5);flex-shrink:0;cursor:pointer;}
+.logo span{color:var(--luffy-red);text-shadow:0 0 20px rgba(232,17,45,.5);}
+.nav-tabs{display:flex;gap:.25rem;flex:1;}
+.nav-tab{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem 1rem;border-radius:4px;cursor:pointer;color:var(--text-muted);border:1px solid transparent;background:none;transition:all .2s;}
+.nav-tab:hover{color:var(--neon-blue);border-color:var(--border);background:rgba(0,212,255,.05);}
+.nav-tab.active{color:var(--neon-blue);border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.08);}
+.search-bar-wrap{position:relative;flex:1;max-width:340px;}
+.search-bar{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:.45rem 1rem .45rem 2.5rem;color:var(--text-primary);font-family:'Rajdhani',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+.search-bar:focus{border-color:rgba(0,212,255,.5);}
+.search-bar::placeholder{color:var(--text-muted);}
+.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+
+/* HERO */
+.hero{position:relative;height:420px;overflow:hidden;background:linear-gradient(135deg,#0a0010 0%,#05050f 50%,#0a0005 100%);}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,17,45,.12) 0%,transparent 50%),linear-gradient(225deg,rgba(0,212,255,.10) 0%,transparent 50%);}
+.hero-gear{position:absolute;right:-60px;top:-60px;width:400px;height:400px;opacity:.04;animation:spin-slow 40s linear infinite;}
+@keyframes spin-slow{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hero-content{position:relative;z-index:2;padding:3rem 2rem;max-width:1400px;margin:0 auto;height:100%;display:flex;flex-direction:column;justify-content:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,17,45,.15);border:1px solid rgba(232,17,45,.3);color:#ff6080;font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:.3rem .8rem;border-radius:3px;margin-bottom:1rem;width:fit-content;}
+.hero-title{font-family:'Bebas Neue',cursive;font-size:clamp(2.5rem,6vw,4.5rem);line-height:1;color:var(--text-primary);margin-bottom:.75rem;}
+.hero-title .highlight{color:var(--neon-blue);text-shadow:0 0 30px rgba(0,212,255,.6);}
+.hero-meta{display:flex;gap:1.5rem;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap;}
+.hero-meta span{font-size:.9rem;color:var(--text-muted);font-weight:600;}
+.hero-meta .rating{color:var(--neon-gold);font-weight:700;}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;}
+.btn-primary{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1.5rem;background:var(--neon-blue);color:#000;border:none;border-radius:4px;cursor:pointer;transition:all .2s;}
+.btn-primary:hover{background:#fff;transform:translateY(-1px);}
+.btn-secondary{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1.5rem;background:rgba(255,255,255,.07);color:var(--text-primary);border:1px solid rgba(255,255,255,.15);border-radius:4px;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{background:rgba(255,255,255,.12);}
+
+/* FILTER BAR */
+.filter-bar{padding:1rem 1.5rem;background:var(--surface);border-bottom:1px solid var(--border);}
+.filter-inner{max-width:1400px;margin:0 auto;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;}
+.filter-label{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);flex-shrink:0;}
+.filter-chip{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.05em;padding:.3rem .8rem;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s;}
+.filter-chip:hover{color:var(--text-primary);border-color:rgba(255,255,255,.25);}
+.filter-chip.active{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.4);color:var(--neon-blue);}
+.filter-sep{width:1px;height:20px;background:var(--border);flex-shrink:0;}
+
+/* MAIN */
+.main-content{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
+.section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;}
+.section-title{font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:.08em;color:var(--text-primary);}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.section-count{font-size:.8rem;color:var(--text-muted);font-weight:600;}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:3rem;}
+.media-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .25s;position:relative;animation:fadeUp .4s ease both;}
+.media-card:hover{border-color:rgba(0,212,255,.45);transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:10;}
+.card-thumb{aspect-ratio:2/3;position:relative;overflow:hidden;}
+.card-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:.05em;text-align:center;padding:1rem;line-height:1.3;}
+.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,.95) 0%,transparent 60%);opacity:0;transition:opacity .25s;display:flex;align-items:flex-end;padding:.75rem;}
+.media-card:hover .card-overlay{opacity:1;}
+.card-play-btn{width:38px;height:38px;border-radius:50%;background:var(--neon-blue);display:flex;align-items:center;justify-content:center;}
+.card-play-btn svg{width:16px;height:16px;margin-left:2px;}
+.card-top-badges{position:absolute;top:.5rem;left:.5rem;right:.5rem;display:flex;justify-content:space-between;align-items:flex-start;}
+.badge{font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;padding:.2rem .45rem;border-radius:3px;letter-spacing:.05em;}
+.badge-quality{background:rgba(0,212,255,.9);color:#000;}
+.card-info{padding:.65rem .75rem;}
+.card-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-meta-row{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text-muted);font-weight:600;}
+.card-rating{color:var(--neon-gold);font-family:'Space Mono',monospace;font-size:.7rem;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card-bg);border:1px solid rgba(0,212,255,.2);border-radius:12px;width:100%;max-width:640px;position:relative;transform:scale(.95) translateY(20px);transition:transform .25s;margin:auto;}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);}
+.modal-banner{height:200px;position:relative;overflow:hidden;border-radius:12px 12px 0 0;}
+.modal-banner-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--card-bg) 0%,rgba(14,14,26,.3) 100%);}
+.modal-close{position:absolute;top:1rem;right:1rem;width:32px;height:32px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .2s;}
+.modal-close:hover{background:var(--luffy-red);}
+.modal-body{padding:1.5rem;}
+.modal-title{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:.05em;margin-bottom:.5rem;}
+.modal-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.modal-tag{font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:3px;border:1px solid rgba(255,255,255,.15);color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;}
+.modal-desc{font-size:.95rem;color:#a0a0c0;line-height:1.65;margin-bottom:1.25rem;}
+
+/* PLAYER CONTROLS BOX */
+.player-controls{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1.25rem;}
+.controls-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.75rem;}
+.controls-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
+.control-group{display:flex;flex-direction:column;gap:.4rem;flex:1;min-width:130px;}
+.control-group label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+.control-select{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:5px;color:var(--text-primary);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;padding:.45rem .75rem;outline:none;cursor:pointer;width:100%;transition:border-color .2s;}
+.control-select:focus{border-color:rgba(0,212,255,.4);}
+.control-select option{background:#1a1a2e;}
+.lang-switcher{display:flex;gap:.5rem;}
+.lang-btn{flex:1;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;padding:.45rem;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s;text-align:center;}
+.lang-btn.active{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:var(--neon-gold);}
+.lang-btn:hover:not(.active){color:var(--text-primary);border-color:rgba(255,255,255,.2);}
+
+/* SERVER SWITCHER */
+.server-section-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.65rem;}
+.server-btn-row{display:flex;gap:.6rem;flex-wrap:wrap;}
+.server-btn{flex:1;min-width:90px;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.7rem .5rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);cursor:pointer;transition:all .2s;}
+.server-btn:hover{border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.05);}
+.server-btn.active{border-color:rgba(0,212,255,.55);background:rgba(0,212,255,.1);box-shadow:0 0 14px rgba(0,212,255,.1);}
+.server-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);transition:background .2s;}
+.server-btn.active .server-dot{background:#3cff6e;box-shadow:0 0 6px #3cff6e;}
+.server-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;color:var(--text-primary);}
+.server-host{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-muted);}
+.server-btn.active .server-host{color:var(--neon-blue);}
+
+/* WATCH BUTTON */
+.watch-btn{width:100%;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem;border-radius:6px;border:none;background:linear-gradient(135deg,var(--luffy-red),#c0001e);color:#fff;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(232,17,45,.3);}
+.watch-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,17,45,.4);}
+.watch-btn:disabled{background:linear-gradient(135deg,#555,#333);box-shadow:none;cursor:not-allowed;transform:none;opacity:.6;}
+
+/* COMING SOON CARD */
+.coming-soon-card{text-align:center;padding:1.5rem 1rem;border:1px dashed rgba(0,212,255,.2);border-radius:8px;margin-bottom:1.25rem;background:rgba(0,0,0,.2);}
+.cs-gear-wrap{width:56px;height:56px;margin:0 auto .75rem;animation:spin-slow 6s linear infinite;opacity:.7;}
+.cs-title{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:.15em;color:var(--neon-blue);margin-bottom:.35rem;}
+.cs-sub{font-size:.85rem;color:#a0a0c0;line-height:1.5;margin-bottom:.3rem;}
+.cs-hint{font-size:.78rem;color:var(--text-muted);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:4rem 1rem;color:var(--text-muted);}
+.empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4;}
+.empty-title{font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:.1em;margin-bottom:.5rem;color:var(--text-primary);opacity:.5;}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:1px solid rgba(0,212,255,.3);border-radius:8px;padding:.85rem 1.25rem;font-weight:600;font-size:.9rem;color:var(--neon-blue);z-index:2000;transform:translateY(100px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:320px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,.97);border-top:1px solid var(--border);z-index:200;padding:.75rem 0 .5rem;}
+.mobile-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;cursor:pointer;color:var(--text-muted);font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;transition:color .2s;}
+.mobile-nav-item.active{color:var(--neon-blue);}
+.mobile-nav-item svg{width:20px;height:20px;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2.5rem 1.5rem;margin-top:2rem;}
+.footer-inner{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center;}
+.footer-logo{font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:.12em;color:var(--neon-blue);text-shadow:0 0 15px rgba(0,212,255,.3);}
+.footer-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--neon-blue),transparent);}
+.footer-sig{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text-muted);letter-spacing:.05em;}
+.footer-sig .name{color:var(--neon-gold);font-weight:700;}
+.footer-motto{font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:.2em;color:var(--luffy-red);text-shadow:0 0 10px rgba(232,17,45,.3);}
+.footer-links{display:flex;gap:1.5rem;font-size:.8rem;}
+.footer-links a{color:var(--text-muted);text-decoration:none;transition:color .2s;font-weight:600;}
+.footer-links a:hover{color:var(--neon-blue);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;background:var(--dark-bg);}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,212,255,.4);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .nav-tabs{display:none;}
+  .mobile-nav{display:flex!important;}
+  .hero{height:320px;}
+  .hero-title{font-size:2rem;}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem;}
+  .header-inner{gap:.75rem;}
+  .search-bar-wrap{max-width:none;}
+  .main-content{padding-bottom:5rem;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo" onclick="setCategory('all')">AJ <span>VAULT</span></div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-cat="all"       onclick="setCategory('all')">All</button>
+      <button class="nav-tab"        data-cat="movies"    onclick="setCategory('movies')">Movies</button>
+      <button class="nav-tab"        data-cat="anime"     onclick="setCategory('anime')">Anime</button>
+      <button class="nav-tab"        data-cat="webseries" onclick="setCategory('webseries')">Web Series</button>
+    </nav>
+    <div class="search-bar-wrap">
+      <span class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <input class="search-bar" type="text" id="searchInput" placeholder="Search titles, genres…" oninput="handleSearch(this.value)"/>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <svg class="hero-gear" viewBox="0 0 200 200" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 10 L110 0 L120 10 L130 0 L140 10 L150 0 L160 10 L170 10 L170 20 L180 30 L170 40 L180 50 L170 60 L180 70 L170 80 L170 90 L160 90 L150 100 L160 110 L150 120 L160 130 L150 140 L160 150 L150 160 L140 160 L130 170 L120 160 L110 170 L100 160 L90 170 L80 160 L70 170 L60 160 L50 160 L40 150 L50 140 L40 130 L50 120 L40 110 L50 100 L40 90 L30 90 L30 80 L20 70 L30 60 L20 50 L30 40 L20 30 L30 20 L30 10 L40 10 L50 0 L60 10 L70 0 L80 10 L90 0 Z M100 60 A40 40 0 1 0 100 140 A40 40 0 1 0 100 60 Z"/>
+  </svg>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff2d55;animation:pulse 1.5s ease-in-out infinite;"></span>
+      NOW STREAMING
+    </div>
+    <h1 class="hero-title">ONE PIECE: <span class="highlight">EGGHEAD ARC</span></h1>
+    <div class="hero-meta">
+      <span class="rating">★ 9.2</span>
+      <span>2024</span>
+      <span>Anime · Adventure · Action</span>
+      <span style="color:#3cff6e;font-weight:700;">HD · 4K Available</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary"   onclick="openModal(CATALOG[0])">▶ Watch Now</button>
+      <button class="btn-secondary" onclick="showToast('Added to My List!')">+ My List</button>
+      <button class="btn-secondary" onclick="showToast('Trailer loading...')">▷ Trailer</button>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <span class="filter-label">Genre</span>
+    <button class="filter-chip active" data-genre="all"      onclick="setGenre('all')">All</button>
+    <button class="filter-chip"        data-genre="action"   onclick="setGenre('action')">Action</button>
+    <button class="filter-chip"        data-genre="romance"  onclick="setGenre('romance')">Romance</button>
+    <button class="filter-chip"        data-genre="thriller" onclick="setGenre('thriller')">Thriller</button>
+    <button class="filter-chip"        data-genre="scifi"    onclick="setGenre('scifi')">Sci-Fi</button>
+    <button class="filter-chip"        data-genre="comedy"   onclick="setGenre('comedy')">Comedy</button>
+    <button class="filter-chip"        data-genre="drama"    onclick="setGenre('drama')">Drama</button>
+    <button class="filter-chip"        data-genre="horror"   onclick="setGenre('horror')">Horror</button>
+    <div class="filter-sep"></div>
+    <span class="filter-label">Lang</span>
+    <button class="filter-chip" data-lang="hindi"    onclick="setLangFilter('hindi')">Hindi</button>
+    <button class="filter-chip" data-lang="original" onclick="setLangFilter('original')">Original</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-content" id="mainContent"></main>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-item active" data-cat="all"       onclick="setCategory('all')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>All
+  </div>
+  <div class="mobile-nav-item" data-cat="movies" onclick="setCategory('movies')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="m10 8 6 4-6 4V8z"/></svg>Movies
+  </div>
+  <div class="mobile-nav-item" data-cat="anime" onclick="setCategory('anime')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Anime
+  </div>
+  <div class="mobile-nav-item" data-cat="webseries" onclick="setCategory('webseries')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Series
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-banner" id="modalBanner">
+      <div class="modal-banner-overlay"></div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-body">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-tags"  id="modalTags"></div>
+      <p  class="modal-desc"   id="modalDesc"></p>
+
+      <div class="player-controls">
+        <div class="controls-title">Playback Settings</div>
+        <div class="controls-row">
+          <div class="control-group">
+            <label>Video Quality</label>
+            <select class="control-select" id="qualitySelect" onchange="showToast('Quality: '+this.value)">
+              <option value="4K">4K Ultra HD</option>
+              <option value="1080p" selected>1080p Full HD</option>
+              <option value="720p">720p HD</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Audio Language</label>
+            <div class="lang-switcher">
+              <button class="lang-btn active" id="langHindi"    onclick="switchLang('Hindi')">🇮🇳 Hindi</button>
+              <button class="lang-btn"        id="langOriginal" onclick="switchLang('Original')">🌐 Original</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="server-section-title">Choose Stream Server</div>
+        <div class="server-btn-row">
+          <button class="server-btn active" data-server="1" onclick="switchServer(this)">
+            <span class="server-dot"></span>
+            <span class="server-label">Server 1</span>
+            <span class="server-host">vidsrc.to</span>
+          </button>
+          <button class="server-btn" data-server="2" onclick="switchServer(this)">
+            <span class="server-dot"></span>
+            <span class="server-label">Server 2</span>
+            <span class="server-host">vidsrc.me</span>
+          </button>
+          <button class="server-btn" data-server="3" onclick="switchServer(this)">
+            <span class="server-dot"></span>
+            <span class="server-label">Server 3</span>
+            <span class="server-host">vidsrc.xyz</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- COMING SOON (shown when tmdbId is null) -->
+      <div class="coming-soon-card" id="comingSoonCard" style="display:none;">
+        <div class="cs-gear-wrap">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="14" stroke="#00d4ff" stroke-width="3"/>
+            <path d="M40 6 L44 2 L50 7 L56 2 L60 9 L67 9 L67 16 L72 22 L66 27 L70 34 L64 38 L68 45 L62 48 L62 56 L54 56 L50 63 L44 58 L38 63 L34 56 L26 56 L26 48 L20 45 L24 38 L18 34 L22 27 L16 22 L21 16 L21 9 L28 9 L32 2 L38 7 Z" stroke="#e8112d" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <div class="cs-title">COMING SOON</div>
+        <p class="cs-sub">This title is not yet available on any server.</p>
+        <p class="cs-hint">Check back soon — it's on its way to the Vault!</p>
+      </div>
+
+      <button class="watch-btn" id="watchBtn" onclick="startWatch()">▶ STREAM NOW — Opens in New Tab</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">AJ VAULT</div>
+    <div class="footer-divider"></div>
+    <p class="footer-sig">Crafted by <span class="name">PAUL SOMENDRA</span> — All Rights Reserved &copy; 2025</p>
+    <p class="footer-motto">WORK SMART NOT HARD</p>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Help Center</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /#app -->
+
+<script>
+/* ════════════════════════════════════════════════
+   CATALOG
+════════════════════════════════════════════════ */
+const CATALOG = [
+  {id:1,  title:"One Piece: Egghead Arc",        type:"anime",     genres:["action","adventure"], year:2024, rating:9.2, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"37854",  season:1, episode:1,
+   desc:"Luffy and the Straw Hats arrive at Egghead Island, the future island of genius Dr. Vegapunk. A massive threat lurks beneath the surface in this electrifying arc."},
+  {id:2,  title:"Jujutsu Kaisen S3",             type:"anime",     genres:["action","horror"],    year:2024, rating:9.0, quality:"1080p", langs:["Hindi","Original"], isNew:true,  tmdbId:"95479",  season:3, episode:1,
+   desc:"The Culling Game arc intensifies as Yuji and allies race to save Tsumiki and dismantle Kenjaku's deadly plot across dangerous colonies."},
+  {id:3,  title:"Attack on Titan: Final Arc",    type:"anime",     genres:["action","drama"],     year:2023, rating:9.8, quality:"4K",    langs:["Hindi","Original"], isNew:false, tmdbId:"1429",   season:4, episode:1,
+   desc:"Eren's devastating plan comes to fruition. Former enemies unite to stop the Rumbling and save the last of humanity."},
+  {id:4,  title:"Demon Slayer: Infinity Castle", type:"anime",     genres:["action","drama"],     year:2024, rating:9.5, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"85937",  season:4, episode:1,
+   desc:"Tanjiro faces Muzan in the infinite maze of the Infinity Castle. The fate of every demon slayer hangs in the final battle."},
+  {id:5,  title:"Blue Lock Season 2",            type:"anime",     genres:["action","drama"],     year:2024, rating:8.7, quality:"1080p", langs:["Hindi","Original"], isNew:true,  tmdbId:"136430", season:2, episode:1,
+   desc:"The Neo Egoist League begins. Isagi's evolved play style clashes with world-class strikers as Japan eyes the World Cup."},
+  {id:6,  title:"Mushoku Tensei Season 3",       type:"anime",     genres:["action","romance"],   year:2025, rating:8.9, quality:"1080p", langs:["Hindi","Original"], isNew:true,  tmdbId:"110701", season:3, episode:1,
+   desc:"Rudeus continues his journey of redemption across magical continents, confronting past traumas with courage."},
+  {id:7,  title:"Kalki 2898-AD",                 type:"movies",    genres:["scifi","action"],     year:2024, rating:8.1, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"915935",
+   desc:"In a dystopian future the 10th avatar of Vishnu descends. An epic Indian sci-fi saga spanning mythology and futurism."},
+  {id:8,  title:"Stree 2",                       type:"movies",    genres:["comedy","horror"],    year:2024, rating:8.4, quality:"1080p", langs:["Hindi","Original"], isNew:true,  tmdbId:"1135027",
+   desc:"The Stree legend continues. Chanderi faces a new supernatural menace — and only the shrewdest team in town can stop it."},
+  {id:9,  title:"Deadpool & Wolverine",          type:"movies",    genres:["action","comedy"],    year:2024, rating:8.0, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"533535",
+   desc:"Wade Wilson recruits the grumpiest Wolverine variant to save the multiverse — and their chemistry is absolutely unhinged."},
+  {id:10, title:"The Batman II",                 type:"movies",    genres:["thriller","action"],  year:2025, rating:8.6, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:null,
+   desc:"Bruce Wayne faces an unraveling Gotham. Robert Pattinson returns for a brooding noir-drenched sequel darker than ever."},
+  {id:11, title:"Pushpa 2: The Rule",            type:"movies",    genres:["action","drama"],     year:2024, rating:8.2, quality:"1080p", langs:["Hindi","Original"], isNew:false, tmdbId:"1219318",
+   desc:"Pushpa Raj returns fiercer than ever. The battle for red sandalwood supremacy reaches fever pitch in this powerhouse sequel."},
+  {id:12, title:"Interstellar Drift",            type:"movies",    genres:["scifi","drama"],      year:2025, rating:8.8, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:null,
+   desc:"A lone cosmonaut stranded at the edge of a collapsing wormhole must solve the greatest physics puzzle humanity has ever faced."},
+  {id:13, title:"Paatal Lok Season 2",           type:"webseries", genres:["thriller","drama"],   year:2024, rating:8.5, quality:"1080p", langs:["Hindi","Original"], isNew:true,  tmdbId:"91455",  season:2, episode:1,
+   desc:"Hathiram Chaudhary returns to the darkest corridors of the Indian criminal underworld. Deeper secrets. Heavier ghosts."},
+  {id:14, title:"The Family Man Season 3",       type:"webseries", genres:["thriller","action"],  year:2024, rating:9.1, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"96879",  season:3, episode:1,
+   desc:"Srikant Tiwari is back on a classified mission that blurs the line between duty and destruction. Manoj Bajpayee at his best."},
+  {id:15, title:"Mirzapur Season 3",             type:"webseries", genres:["action","drama"],     year:2024, rating:8.3, quality:"1080p", langs:["Hindi","Original"], isNew:false, tmdbId:"82856",  season:3, episode:1,
+   desc:"Guddu Pandit consolidates power in Mirzapur while new rivals and old ghosts threaten to shatter everything he built."},
+  {id:16, title:"Sacred Games Reloaded",         type:"webseries", genres:["thriller","drama"],   year:2025, rating:8.9, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"73137",  season:1, episode:1,
+   desc:"Mumbai's deadliest conspiracy reignites. New players enter the game of gods and criminals as the city teeters on the edge."},
+  {id:17, title:"Arcane Season 2",               type:"webseries", genres:["action","scifi"],     year:2024, rating:9.6, quality:"4K",    langs:["Hindi","Original"], isNew:false, tmdbId:"94605",  season:2, episode:1,
+   desc:"Piltover and the Undercity fracture further. Vi and Jinx face impossible choices while magic and technology spiral to war."},
+  {id:18, title:"Squid Game Season 3",           type:"webseries", genres:["thriller","drama"],   year:2025, rating:8.7, quality:"4K",    langs:["Hindi","Original"], isNew:true,  tmdbId:"93405",  season:3, episode:1,
+   desc:"Gi-hun infiltrates the Games from within. The new host rebuilt them with rules that even the players cannot predict."},
+];
+
+/* ════════════════════════════════════════════════
+   SERVER CONFIG
+════════════════════════════════════════════════ */
+const SERVERS = [
+  { num:1, label:'SERVER 1', host:'vidsrc.to',
+    urlMovie: id      => `https://vidsrc.to/embed/movie/${id}`,
+    urlTv:   (id,s,e) => `https://vidsrc.to/embed/tv/${id}/${s}/${e}` },
+  { num:2, label:'SERVER 2', host:'vidsrc.me',
+    urlMovie: id      => `https://vidsrc.me/embed/movie?tmdb=${id}`,
+    urlTv:   (id,s,e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+  { num:3, label:'SERVER 3', host:'vidsrc.xyz',
+    urlMovie: id      => `https://vidsrc.xyz/embed/movie?tmdb=${id}`,
+    urlTv:   (id,s,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+];
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+const TYPE_LABEL  = {movies:'MOVIE', anime:'ANIME', webseries:'SERIES'};
+const TYPE_COLOR  = {movies:'#3a8fff', anime:'#e8112d', webseries:'#a855f7'};
+const PALETTES    = [['#1a0530','#3a0080'],['#001020','#003060'],['#0d0005','#400020'],
+                     ['#001a00','#004400'],['#1a1000','#3a2000'],['#0a0010','#200040']];
+let activeCategory   = 'all';
+let activeGenre      = 'all';
+let activeLangFilter = 'all';
+let searchQuery      = '';
+let currentModal     = null;
+let currentLang      = 'Hindi';
+let activeServerNum  = 1;
+
+/* ════════════════════════════════════════════════
+   URL BUILDER
+════════════════════════════════════════════════ */
+function buildStreamUrl(srv, item) {
+  if (!item.tmdbId) return null;
+  if (item.type === 'movies') return srv.urlMovie(item.tmdbId);
+  return srv.urlTv(item.tmdbId, item.season||1, item.episode||1);
+}
+
+/* ════════════════════════════════════════════════
+   SERVER SWITCH — highlight button, save choice
+════════════════════════════════════════════════ */
+function switchServer(btn) {
+  document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeServerNum = parseInt(btn.dataset.server);
+  const srv = SERVERS.find(s => s.num === activeServerNum);
+  showToast(`✓ ${srv.label} selected — ${srv.host}`);
+}
+
+/* ════════════════════════════════════════════════
+   STREAM NOW — opens new tab
+════════════════════════════════════════════════ */
+function startWatch() {
+  if (!currentModal) return;
+  if (!currentModal.tmdbId) { showToast('⏳ Coming Soon — not available yet!'); return; }
+  const srv     = SERVERS.find(s => s.num === activeServerNum);
+  const url     = buildStreamUrl(srv, currentModal);
+  const quality = document.getElementById('qualitySelect').value;
+  showToast(`🚀 Opening on ${srv.host} · ${quality} · ${currentLang}`);
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+/* ════════════════════════════════════════════════
+   OPEN MODAL
+════════════════════════════════════════════════ */
+function openModal(item) {
+  if (!item) return;
+  currentModal = item;
+
+  document.getElementById('modalTitle').textContent = item.title;
+  document.getElementById('modalDesc').textContent  = item.desc;
+
+  const tags = [
+    `<span class="modal-tag">${item.year}</span>`,
+    `<span class="modal-tag">${item.quality}</span>`,
+    ...item.genres.map(g => `<span class="modal-tag">${g}</span>`),
+    `<span class="modal-tag" style="color:var(--neon-gold);border-color:rgba(255,215,0,.3)">★ ${item.rating}</span>`,
+    `<span class="modal-tag" style="color:${TYPE_COLOR[item.type]};border-color:${TYPE_COLOR[item.type]}44">${TYPE_LABEL[item.type]}</span>`,
+  ].join('');
+  document.getElementById('modalTags').innerHTML = tags;
+
+  const [bg1, bg2] = PALETTES[item.id % PALETTES.length];
+  document.getElementById('modalBanner').style.background = `linear-gradient(135deg,${bg1},${bg2})`;
+
+  // Reset controls
+  currentLang = 'Hindi';
+  document.getElementById('langHindi').classList.add('active');
+  document.getElementById('langOriginal').classList.remove('active');
+  document.getElementById('qualitySelect').value =
+    item.quality==='4K' ? '4K' : item.quality==='1080p' ? '1080p' : '720p';
+
+  activeServerNum = 1;
+  document.querySelectorAll('.server-btn').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.server)===1)
+  );
+
+  // Coming Soon vs available
+  const watchBtn   = document.getElementById('watchBtn');
+  const csCard     = document.getElementById('comingSoonCard');
+  if (item.tmdbId) {
+    csCard.style.display   = 'none';
+    watchBtn.textContent   = '▶ STREAM NOW — Opens in New Tab';
+    watchBtn.disabled      = false;
+  } else {
+    csCard.style.display   = 'block';
+    watchBtn.textContent   = '🕐 COMING SOON — Not Yet Available';
+    watchBtn.disabled      = true;
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ════════════════════════════════════════════════
+   CLOSE MODAL
+════════════════════════════════════════════════ */
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+/* ════════════════════════════════════════════════
+   LANGUAGE
+════════════════════════════════════════════════ */
+function switchLang(lang) {
+  currentLang = lang;
+  document.getElementById('langHindi').classList.toggle('active', lang==='Hindi');
+  document.getElementById('langOriginal').classList.toggle('active', lang==='Original');
+  showToast(`Audio: ${lang==='Hindi' ? '🇮🇳 Hindi Dub' : '🌐 Original Audio'}`);
+}
+
+/* ════════════════════════════════════════════════
+   FILTER LOGIC
+════════════════════════════════════════════════ */
+function getFiltered() {
+  return CATALOG.filter(item => {
+    const q = searchQuery.toLowerCase();
+    return (activeCategory==='all' || item.type===activeCategory)
+      && (activeGenre==='all' || item.genres.includes(activeGenre))
+      && (activeLangFilter==='all' || item.langs.map(l=>l.toLowerCase()).includes(activeLangFilter))
+      && (!q || item.title.toLowerCase().includes(q) || item.genres.some(g=>g.includes(q)));
+  });
+}
+function setCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.cat===cat));
+  document.querySelectorAll('.mobile-nav-item').forEach(t => t.classList.toggle('active', t.dataset.cat===cat));
+  renderContent();
+}
+function setGenre(genre) {
+  activeGenre = (activeGenre===genre) ? 'all' : genre;
+  document.querySelectorAll('.filter-chip[data-genre]').forEach(c => c.classList.toggle('active', c.dataset.genre===activeGenre));
+  renderContent();
+}
+function setLangFilter(lang) {
+  activeLangFilter = (activeLangFilter===lang) ? 'all' : lang;
+  document.querySelectorAll('.filter-chip[data-lang]').forEach(c => c.classList.toggle('active', c.dataset.lang===activeLangFilter));
+  renderContent();
+}
+function handleSearch(val) { searchQuery = val.trim(); renderContent(); }
+
+/* ════════════════════════════════════════════════
+   CARD + RENDER
+════════════════════════════════════════════════ */
+function buildCard(item, idx) {
+  const delay      = (idx%20)*0.04;
+  const [bg1, bg2] = PALETTES[item.id % PALETTES.length];
+  const tc         = TYPE_COLOR[item.type];
+  const tl         = TYPE_LABEL[item.type];
+  return `<div class="media-card" onclick="openModal(CATALOG.find(c=>c.id===${item.id}))" style="animation-delay:${delay}s">
+    <div class="card-thumb">
+      <div class="card-thumb-placeholder" style="background:linear-gradient(135deg,${bg1},${bg2})">${item.title}</div>
+      <div class="card-top-badges">
+        <span class="badge badge-quality">${item.quality}</span>
+        <span class="badge" style="background:${tc}22;color:${tc};border:1px solid ${tc}44">${tl}</span>
+      </div>
+      <div class="card-overlay">
+        <div class="card-play-btn"><svg viewBox="0 0 24 24" fill="#000"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-title">${item.title}</div>
+      <div class="card-meta-row"><span>${item.year}</span><span class="card-rating">★ ${item.rating}</span></div>
+    </div>
+  </div>`;
+}
+function renderSection(title, items) {
+  if (!items.length) return '';
+  return `<div class="section-header">
+    <h2 class="section-title">${title}</h2>
+    <div class="section-line"></div>
+    <span class="section-count">${items.length} titles</span>
+  </div>
+  <div class="card-grid">${items.map((it,i)=>buildCard(it,i)).join('')}</div>`;
+}
+function renderContent() {
+  const filtered = getFiltered();
+  const main     = document.getElementById('mainContent');
+  if (!filtered.length) {
+    main.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No Results Found</div><p style="font-size:.9rem">Try different filters or search terms</p></div>`;
+    return;
+  }
+  let html = '';
+  if (activeCategory==='all' && !searchQuery) {
+    const trending = filtered.filter(i=>i.isNew).slice(0,6);
+    const anime    = filtered.filter(i=>i.type==='anime');
+    const movies   = filtered.filter(i=>i.type==='movies');
+    const series   = filtered.filter(i=>i.type==='webseries');
+    if (trending.length) html += renderSection('🔥 Trending Now', trending);
+    if (anime.length)    html += renderSection('⚔ Anime', anime);
+    if (movies.length)   html += renderSection('🎬 Movies', movies);
+    if (series.length)   html += renderSection('📺 Web Series', series);
+  } else {
+    const label = activeCategory!=='all' ? TYPE_LABEL[activeCategory]+'S'
+                : searchQuery ? `Search: "${searchQuery}"` : 'Results';
+    html += renderSection(label, filtered);
+  }
+  main.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+/* ════════════════════════════════════════════════
+   KEYBOARD
+════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') closeModal();
+  if (e.key==='/' && document.activeElement.id!=='searchInput') {
+    e.preventDefault(); document.getElementById('searchInput').focus();
+  }
+});
+
+/* INIT */
+renderContent();
+</script>
+</body>
+</html>
