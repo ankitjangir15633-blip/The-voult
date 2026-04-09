@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VAULT | PAUL SOMENDRA</title>
+    <style>
+        body { margin: 0; background: #000; color: white; font-family: sans-serif; }
+        header { padding: 20px; text-align: center; color: #e50914; font-size: 2rem; font-weight: 900; letter-spacing: 2px; }
+        .hero { height: 40vh; background: linear-gradient(transparent, #000), url('https://wallpapercave.com/wp/wp1917154.jpg') center/cover; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px; }
+        .card { background: #111; border-radius: 8px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
+        .card:hover { transform: scale(1.05); border-color: #e50914; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card p { padding: 10px; margin: 0; font-size: 0.8rem; text-align: center; }
+        #player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 1000; }
+        .close { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 1001; }
+        iframe { width: 100%; height: 100%; border: none; }
+        footer { text-align: center; padding: 40px; opacity: 0.5; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<header>THE VAULT</header>
+<div class="hero"><div><h1>PAUL SOMENDRA PRESENTS</h1><p>WORK SMART NOT HARD</p></div></div>
+
+<div class="grid">
+    <div class="card" onclick="play('912649')">
+        <img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w500/8cdWjvZQUmSMyU9t2S78STmSost.jpg">
+        <p>Spider-Man: No Way Home</p>
+    </div>
+    <div class="card" onclick="play('299534')">
+        <img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w500/or06vS3ST0PgpCgCwvKvbM0pNWG.jpg">
+        <p>Avengers: Endgame</p>
+    </div>
+    <div class="card" onclick="play('671')">
+        <img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w500/wuMc08IPG7jb260ansPC5kOidS5.jpg">
+        <p>Harry Potter</p>
+    </div>
+    <div class="card" onclick="play('157336')">
+        <img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w500/gEU2QniE6E07Qv8vNGjuRUDQp6m.jpg">
+        <p>Interstellar</p>
+    </div>
+     <div class="card" onclick="play('823219')">
+        <img src="https://images.weserv.nl/?url=https://image.tmdb.org/t/p/w500/6oom5QYv7ny6v61o9pQ9L6is6ft.jpg">
+        <p>Justice League</p>
+    </div>
+</div>
+
+<footer>DESIGNED BY PAUL SOMENDRA <br> WORK SMART NOT HARD</footer>
+
+<div id="player">
+    <span class="close" onclick="stop()">×</span>
+    <iframe id="f" allowfullscreen></iframe>
+</div>
+
+<script>
+    function play(id) {
+        document.getElementById('f').src = "https://vidsrc.me/embed/movie?tmdb=" + id;
+        document.getElementById('player').style.display = 'block';
+    }
+    function stop() {
+        document.getElementById('player').style.display = 'none';
+        document.getElementById('f').src = "";
+    }
+</script>
+
+</body>
+</html>
