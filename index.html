@@ -3,124 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS AI | AUTHORIZED FOR AJ</title>
+    <title>JARVIS OS | AUTHORIZED AJ</title>
     <style>
-        :root { --glow: #00f2ff; }
-        body { margin: 0; background: #050505; color: var(--glow); font-family: 'Courier New', monospace; overflow: hidden; display: flex; flex-direction: column; height: 100vh; justify-content: center; align-items: center; }
+        :root { --glow: #00f2ff; --bg: #020a10; }
+        body { margin: 0; background: var(--bg); color: var(--glow); font-family: 'Segoe UI', monospace; display: flex; flex-direction: column; height: 100vh; align-items: center; justify-content: center; overflow: hidden; }
         
-        /* Arc Reactor Animation */
-        .arc-reactor { width: 150px; height: 150px; border: 4px solid var(--glow); border-radius: 50%; box-shadow: 0 0 20px var(--glow), inset 0 0 20px var(--glow); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; animation: pulse 2s infinite; }
-        .inner-circle { width: 100px; height: 100px; border: 2px dashed var(--glow); border-radius: 50%; animation: spin 5s linear infinite; }
+        /* Cinematic Arc Reactor */
+        .reactor { width: 180px; height: 180px; border: 2px solid rgba(0, 242, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; animation: rotate 10s linear infinite; }
+        .reactor-inner { width: 120px; height: 120px; border: 4px solid var(--glow); border-radius: 50%; box-shadow: 0 0 30px var(--glow), inset 0 0 15px var(--glow); }
         
-        @keyframes pulse { 0% { box-shadow: 0 0 10px var(--glow); transform: scale(1); } 50% { box-shadow: 0 0 40px var(--glow); transform: scale(1.05); } 100% { box-shadow: 0 0 10px var(--glow); transform: scale(1); } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        #status { margin-top: 30px; font-size: 1.2rem; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 10px var(--glow); text-align: center; }
-        #console { width: 80%; height: 100px; margin-top: 20px; background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); padding: 10px; font-size: 12px; color: #fff; overflow-y: auto; text-align: left; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        #status { margin-top: 40px; font-size: 14px; letter-spacing: 5px; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px var(--glow); }
+        #console { width: 85%; height: 120px; background: rgba(0,0,0,0.5); border: 1px solid #111; margin-top: 20px; padding: 10px; font-size: 11px; overflow-y: auto; color: #888; border-radius: 5px; }
     </style>
 </head>
-<body onclick="startJarvis()">
+<body onclick="activate()">
 
-    <div id="status">MISTER AJ<br>TAP TO ACTIVATE</div>
-    
-    <div class="arc-reactor">
-        <div class="inner-circle"></div>
-    </div>
-
-    <div id="console">
-        > SYSTEM: STANDBY...<br>
-        > WAITING FOR AUTHENTICATION...
-    </div>
+    <div id="status">AUTHENTICATION REQUIRED</div>
+    <div class="reactor"><div class="reactor-inner"></div></div>
+    <div id="console">> CORE_V4 READY...<br>> AWAITING AJ'S COMMAND...</div>
 
 <script>
-    // CREDENTIALS - AGAR TOKEN EXPIRE HO JAYE TO NAYA YAHAN DALNA
-    const GITHUB_TOKEN = "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"; 
-    const USERNAME = "ankitjangir15633-blip"; 
-    const REPO = "The-voult";
+    // ⬇️ YAHAN APNA NAYA TOKEN DALO (BINA KISI KO BATAYE)
+    const TOKEN = "YAHAN_NAYA_TOKEN_PASTE_KARO"; 
+    const REPO_INFO = { user: "ankitjangir15633-blip", repo: "The-voult" };
 
-    const statusDisplay = document.getElementById('status');
-    const consoleLog = document.getElementById('console');
+    const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    rec.lang = 'hi-IN';
 
-    // SPEECH RECOGNITION SETUP
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'hi-IN'; // Hindi/English Mix support
-    recognition.continuous = false;
-
-    function startJarvis() {
+    function activate() {
         try {
-            recognition.start();
-            statusDisplay.innerHTML = "LISTENING...";
-            addLog("SYSTEM: Mic Active. Listening for commands.");
-            speak("Authorized. Mister AJ, what is your command?");
-        } catch(e) { addLog("SYSTEM: Restarting sensor..."); }
+            rec.start();
+            document.getElementById('status').innerText = "LISTENING...";
+            speak("Authorized. Mister AJ, systems are at your command.");
+        } catch(e) {}
     }
 
-    recognition.onresult = async (event) => {
-        const cmd = event.results[0][0].transcript.toLowerCase();
-        statusDisplay.innerHTML = "PROCESSING...";
-        addLog("AJ: " + cmd);
+    rec.onresult = async (e) => {
+        const cmd = e.results[0][0].transcript.toLowerCase();
+        log("AJ: " + cmd);
         
-        // ACTION LOGIC
-        if (cmd.includes("app") || cmd.includes("banao") || cmd.includes("create") || cmd.includes("chiz")) {
-            await executeAction(cmd);
+        if(cmd.includes("app") || cmd.includes("banao") || cmd.includes("file")) {
+            executeBuild(cmd);
         } else {
-            speak("Understood, AJ. I'm processing your data.");
+            speak("Processing data, AJ.");
         }
-    };
-
-    async function executeAction(cmd) {
-        speak("Executing Protocol. Creating your application file on GitHub Cloud.");
-        addLog("ACTION: Initializing Code Push...");
-
-        const fileName = "AJ_Build_" + Date.now() + ".html";
-        const codeContent = `
-            <html>
-            <body style="background:#000; color:#00f2ff; font-family:sans-serif; text-align:center; padding-top:100px;">
-                <h1>PROJECT: ${cmd.toUpperCase()}</h1>
-                <p>Status: Successfully Built by JARVIS AI</p>
-                <p>Owner: Mister AJ</p>
-            </body>
-            </html>
-        `;
-
-        const url = `https://api.github.com/repos/${USERNAME}/${REPO}/contents/${fileName}`;
-        
-        try {
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${GITHUB_TOKEN}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "JARVIS Deployment for AJ",
-                    content: btoa(unescape(encodeURIComponent(codeContent))) 
-                })
-            });
-
-            if (response.ok) {
-                speak("Mister AJ, task complete. Your new file is live in the vault.");
-                addLog("SUCCESS: File '" + fileName + "' pushed to GitHub.");
-            } else {
-                speak("Authentication error. AJ, please check if your token is still active.");
-                addLog("ERROR: GitHub API Denied. (Token might be revoked)");
-            }
-        } catch (err) {
-            addLog("SYSTEM ERROR: " + err);
-        }
-        
-        statusDisplay.innerHTML = "MISTER AJ<br>TAP FOR NEXT COMMAND";
     }
 
-    function addLog(msg) {
-        consoleLog.innerHTML += `<br>> ${msg}`;
-        consoleLog.scrollTop = consoleLog.scrollHeight;
+    async function executeBuild(cmd) {
+        speak("Action initiated. Deploying new architecture to your vault.");
+        const name = "Project_" + Math.floor(Math.random()*999) + ".html";
+        const content = btoa(`<h1>Build for AJ</h1><p>Command: ${cmd}</p>`);
+        
+        const res = await fetch(`https://api.github.com/repos/${REPO_INFO.user}/${REPO_INFO.repo}/contents/${name}`, {
+            method: "PUT",
+            headers: { "Authorization": `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "JARVIS Build", content: content })
+        });
+
+        if(res.ok) {
+            speak("Task complete, Mister AJ. The file is live.");
+            log("SUCCESS: " + name + " pushed.");
+        } else {
+            speak("Mister AJ, there is a security breach. Token is invalid.");
+            log("ERROR: Unauthorized access.");
+        }
     }
 
     function speak(text) {
+        const synth = window.speechSynthesis;
         const msg = new SpeechSynthesisUtterance(text);
-        msg.pitch = 0.8; // Deep professional voice
-        window.speechSynthesis.speak(msg);
+        // Awaaz ko JARVIS jaisa bhari banane ke liye settings:
+        msg.pitch = 0.6; 
+        msg.rate = 0.9;
+        synth.speak(msg);
+    }
+
+    function log(m) { 
+        const c = document.getElementById('console');
+        c.innerHTML += "<br>> " + m; 
+        c.scrollTop = c.scrollHeight;
     }
 </script>
 </body>
